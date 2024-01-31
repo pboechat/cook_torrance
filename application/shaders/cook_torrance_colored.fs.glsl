@@ -52,7 +52,7 @@ vec3 CookTorrance(vec3 materialDiffuseColor,
 
 		Rs = (F * D * G) / (PI * NdotL * NdotV);
 	}
-	return materialDiffuseColor * lightColor * NdotL + lightColor * materialSpecularColor * NdotL * (k + Rs * (1.0 - k));
+	return materialDiffuseColor * lightColor * NdotL + lightColor * materialSpecularColor * Rs;
 }
 
 void main()

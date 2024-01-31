@@ -481,20 +481,20 @@ void initializeUniformsInspector(TwBar* bar, std::map<std::string, Uniform>& uni
 		case GL_SAMPLER_2D:
 			TwAddVarCB(bar, uniform.name.c_str(), g_textureType, setUniformValue_callback<Texture>, getUniformValue_callback<Texture>, &uniform, "");
 			break;
-		/*case GL_FLOAT_MAT3:
-		case GL_FLOAT_MAT4:
-		case GL_INT_VEC2:
-		case GL_INT_VEC3:
-		case GL_INT_VEC4:
-		case GL_BOOL_VEC2:
-		case GL_BOOL_VEC3:
-		case GL_BOOL_VEC4:
-		case GL_FLOAT_MAT2:
-		case GL_SAMPLER_1D:
-		case GL_SAMPLER_3D:
-		case GL_SAMPLER_CUBE:
-		case GL_SAMPLER_1D_SHADOW:
-		case GL_SAMPLER_2D_SHADOW:*/
+			/*case GL_FLOAT_MAT3:
+			case GL_FLOAT_MAT4:
+			case GL_INT_VEC2:
+			case GL_INT_VEC3:
+			case GL_INT_VEC4:
+			case GL_BOOL_VEC2:
+			case GL_BOOL_VEC3:
+			case GL_BOOL_VEC4:
+			case GL_FLOAT_MAT2:
+			case GL_SAMPLER_1D:
+			case GL_SAMPLER_3D:
+			case GL_SAMPLER_CUBE:
+			case GL_SAMPLER_1D_SHADOW:
+			case GL_SAMPLER_2D_SHADOW:*/
 		default:
 			std::cout << "unsupported uniform type (" << uniform.type << ")" << std::endl;
 		}
@@ -515,11 +515,9 @@ void TwAddStringVarRO(TwBar* bar, const char* name, const std::string& value)
 //////////////////////////////////////////////////////////////////////////
 int main(int argc, char** argv)
 {
-	if (argc < 4)
-	{
-		std::cout << "usage: <obj file> <vertex shader file> <fragment shader file>" << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	std::string obj = argc >= 2 ? argv[1] : "bunny.obj";
+	std::string vertexShader = argc >= 3 ? argv[2] : "common.vs.glsl";
+	std::string fragmentShader = argc >= 4 ? argv[3] : "cook_torrance_colored.fs.glsl";
 
 	auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -566,9 +564,9 @@ int main(int argc, char** argv)
 	TwDefine(" Uniforms position='590 10' ");
 	TwWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	TwAddStringVarRO<0>(bar0, "OBJ", argv[1]);
-	TwAddStringVarRO<1>(bar0, "Vertex Shader", argv[2]);
-	TwAddStringVarRO<2>(bar0, "Fragment Shader", argv[3]);
+	TwAddStringVarRO<0>(bar0, "OBJ", obj);
+	TwAddStringVarRO<1>(bar0, "Vertex Shader", vertexShader);
+	TwAddStringVarRO<2>(bar0, "Fragment Shader", fragmentShader);
 	TwAddVarRW(bar0, "Show Light", TW_TYPE_BOOLCPP, &g_ShowLight, "");
 	TwAddVarRW(bar0, "Light Color", g_vec3Type, &g_LightColor, "");
 	TwAddVarRW(bar0, "Light Position", g_vec3Type, &g_LightPosition, "");
@@ -584,7 +582,7 @@ int main(int argc, char** argv)
 	// NOTE: opening scope so that objects created inside of it can be destroyed before the program ends
 	{
 		// Reading shader source from files
-		Shader shader0(SHADERS_DIR + argv[2], SHADERS_DIR + argv[3]);
+		Shader shader0(SHADERS_DIR + vertexShader, SHADERS_DIR + fragmentShader);
 		Shader shader1(SHADERS_DIR + "common.vs.glsl", SHADERS_DIR + "light_source.fs.glsl");
 
 		std::map<std::string, Uniform> uniformsMap;
@@ -597,7 +595,7 @@ int main(int argc, char** argv)
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec2> uvs;
 		std::vector<glm::vec3> normals;
-		if (!loadOBJData((MEDIA_DIR + argv[1]).c_str(), vertices, uvs, normals))
+		if (!loadOBJData((MEDIA_DIR + obj).c_str(), vertices, uvs, normals))
 		{
 			std::cout << "error loading OBJ" << std::endl;
 			exit(EXIT_FAILURE);
